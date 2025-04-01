@@ -40,16 +40,19 @@ pipeline {
             }
         }
         stage('deployment'){
-            withAWS(region: 'us-east-1', credentials: 'aws-creds') {
-                sh """
-                aws eks update-kubeconfig --region ${region} --name ${project}-${environment}
-                cd helm
-                sed -i s/IMAGE_VERSION/${appVersion}/g values.yaml
-                helm install --upgrade ${component} -n ${project}
-                """
+            steps{
+                withAWS(region: 'us-east-1', credentials: 'aws-creds') {
+                    sh """
+                    aws eks update-kubeconfig --region ${region} --name ${project}-${environment}
+                    cd helm
+                    sed -i s/IMAGE_VERSION/${appVersion}/g values.yaml
+                    helm install --upgrade ${component} -n ${project}
+                    """
                 }
             }
         }
+    }
+        
     post{
         always{
             echo "this will run always"
