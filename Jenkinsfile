@@ -9,7 +9,6 @@ pipeline {
     }
     environment {
         DEBUG = 'true'
-        appVersion= ''
         region= 'us-east-1'
         account_id = '180294178330'
         project = 'expense'
@@ -21,8 +20,8 @@ pipeline {
             steps {
                 script {
                     sh 'git clone https://github.com/raghuatharva/jenkins-backend.git'
-                    def appVersion = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
-                    echo "The latest version is ${appVersion}"
+                    env.APP_VERSION = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
+                    echo "The latest version is ${env.APP_VERSION}"
                 }
             }
         }
@@ -32,8 +31,8 @@ pipeline {
                 withAWS(region: 'us-east-1', credentials: 'aws-creds') {
                 sh """
                 aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${account_id}.dkr.ecr.us-east-1.amazonaws.com
-                docker build -t ${account_id}.dkr.ecr.${region}.amazonaws.com/${project}/${environment}/${component}:${appVersion} .
-                docker push ${account_id}.dkr.ecr.us-east-1.amazonaws.com/${project}/${environment}/${component}:${appVersion}
+                docker build -t ${account_id}.dkr.ecr.${region}.amazonaws.com/${project}/${environment}/${component}:${env.APP_VERSION} .
+                docker push ${account_id}.dkr.ecr.us-east-1.amazonaws.com/${project}/${environment}/${component}:${env.APP_VERSION}
                 """
                 }
             }
@@ -44,7 +43,7 @@ pipeline {
                     sh """
                     aws eks update-kubeconfig --region ${region} --name ${project}-${environment}
                     cd helm
-                    sed -i s/IMAGE_VERSION/${appVersion}/g values.yaml
+                    sed -i s/IMAGE_VERSION/${env.APP_VERSION}/g values.yaml
                     helm install --upgrade ${component} -n ${project}
                     """
                 }
