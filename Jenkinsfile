@@ -22,8 +22,8 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'git-credentials', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
                         sh 'git clone https://github.com/raghuatharva/jenkins-backend.git'
-                        appVersion = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
-                        echo " the latest version is ${appVersion}"
+                        def appVersion = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()  // ✅ Use def
+                        echo "The latest version is ${appVersion}"
                     }
                 }
             }
