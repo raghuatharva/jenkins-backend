@@ -25,6 +25,7 @@ pipeline {
                     echo " the latest version is ${appVersion}"
                 }
             }
+        }
         stage('building docker image'){
             steps{
                 withAWS(region: 'us-east-1', credentials: 'aws-creds') {
@@ -63,4 +64,3 @@ pipeline {
         }
     }
 }
-
