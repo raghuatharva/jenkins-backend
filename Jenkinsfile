@@ -44,7 +44,7 @@ pipeline {
                     aws eks update-kubeconfig --region ${region} --name ${project}-${environment}
                     cd helm
                     sed -i s/IMAGE_VERSION/${env.APP_VERSION}/g values.yaml
-                    helm install --upgrade ${component} -n ${project}
+                    helm upgrade --install ${component} -n ${project} .
                     """
                 }
             }
