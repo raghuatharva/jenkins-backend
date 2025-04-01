@@ -18,12 +18,13 @@ pipeline {
     }
     stages{
         stage('read the version') {
-            steps{
-                sh 'git clone https://github.com/raghuatharva/jenkins-backend.git'
-                appVersion = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
-                echo " the latest version is ${appVersion}"
+            script {
+                steps{
+                    sh 'git clone https://github.com/raghuatharva/jenkins-backend.git'
+                    def appVersion = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
+                    echo " the latest version is ${appVersion}"
+                }
             }
-        }
         stage('building docker image'){
             steps{
                 withAWS(region: 'us-east-1', credentials: 'aws-creds') {
