@@ -1,3 +1,23 @@
+
+// In actual organistation pipelines:
+
+// ✅ npm install is done outside Docker in CI to:
+
+// Run tests
+// Lint code
+// npm install downloads all required node modules listed in package.json
+//      Without them:
+//           ❌ Unit tests fail
+
+// Do SonarQube scan
+
+// Then again npm install (or npm ci) is done inside Docker (via Dockerfile) to:
+// Bundle app correctly for prod
+// Reduce image size with optimized builds
+
+
+
+
 pipeline {
     agent {
         label 'AGENT-1'
@@ -21,9 +41,15 @@ pipeline {
             steps {
                 script {
                     sh 'git clone https://github.com/raghuatharva/jenkins-backend.git'
-                    env.APP_VERSION = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
+                    APP_VERSION = sh(script: 'cd jenkins-backend && git describe --tags --abbrev=0', returnStdout: true).trim()
                     echo "The latest version is ${env.APP_VERSION}"
                 }
+                // this is the only and best way to get the tag version. clone it , cd into cloned repo and get the latest tag version. 
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
             }
         }
 
